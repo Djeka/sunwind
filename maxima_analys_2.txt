@@ -1,0 +1,204 @@
+eq1: (a - Bxbbf) + (Bycfb - Bybfb) + (Bzfbb - b) = 0;
+eq2: (Bxfbf - a) + (Bycff - Bybff) + (Bzffb - c) = 0;
+eq3: (d - Bxbbb) + (Bycbb - Bybbb) + (b - Bzbbb) = 0;
+eq4: (Bxfbb - d) + (Bycbf - Bybbf) + (c - Bzbfb) = 0;
+eq5: (Bxcff - Bxbff) + (Byffb - Bycfb) + (Bzfbf - e) = 0;
+eq6: (Bxfff - Bxcff) + (Byfff - Bycff) + (Bzfff - Bzcff) = 0;
+eq7: (Bxcfb - Bxbfb) + (Byfbb - Bycbb) + (e - Bzbbf) = 0;
+
+
+Bxcbf = x1;
+Bzcbb = x2;
+Bzcfb = x3;
+Bxcbb = x4;
+Bzcbf = x5;
+
+
+s: solve([eq1, eq2, eq3, eq4], [Bycff, Bycfb, Bycbf, Bycbb]);
+s: solve([eq5, eq6, eq7], [Bxcff, Bzcff, Bxcfb]);
+
+
+Bxcff : x5 - Bzfbf - Bzfbb - Byffb + Bybfb + Bxbff + Bxbbf + x2 - x1;
+Bxcfb : - x5 - x4 + Bzbbf + Bzbbb - Byfbb + Bybbb + Bxbfb + Bxbbb - x2;
+Bxcbf = x1;
+Bxcbb = x4;
+
+Bycff :  x3 - Bzffb + Bybff - Bxfbf + x1;
+Bycfb : - Bzfbb + Bybfb + Bxbbf + x2 - x1;
+Bycbf : x4 -  x3 + Bzbfb + Bybbf - Bxfbb;
+Bycbb : - x4 + Bzbbb + Bybbb + Bxbbb - x2;
+
+Bzcff : - x5 -  x3 + Bzfff + Bzffb + Bzfbf + Bzfbb + Byfff + Byffb - Bybff - Bybfb + Bxfff + Bxfbf - Bxbff - Bxbbf - x2;
+Bzcfb = x3;
+Bzcbf = x5;
+Bzcbb = x2;
+
+
+
+min(Bxfff, Bxbff) <= x5 - Bzfbf - Bzfbb - Byffb + Bybfb + Bxbff + Bxbbf + x2 - x1 <= max(Bxfff, Bxbff)
+min(Bxffb, Bxbfb) <= - x5 - x4 + Bzbbf + Bzbbb - Byfbb + Bybbb + Bxbfb + Bxbbb - x2 <= max(Bxffb, Bxbfb)
+min(Bxfbf, Bxbbf) <= x1 <= max(Bxfbf, Bxbbf)
+min(Bxfbb, Bxbbb) <= x4 <= max(Bxfbb, Bxbbb)
+
+min(Byfff, Bybff) <= x3 - Bzffb + Bybff - Bxfbf + x1 <= max(Byfff, Bybff)
+min(Byffb, Bybfb) <= - Bzfbb + Bybfb + Bxbbf + x2 - x1 <= max(Byffb, Bybfb)
+min(Byfbf, Bybbf) <= x4 -  x3 + Bzbfb + Bybbf - Bxfbb <= max(Byfbf, Bybbf)
+min(Byfbb, Bybbb) <= - x4 + Bzbbb + Bybbb + Bxbbb - x2 <= max(Byfbb, Bybbb)
+
+min(Bzfff, Bzbff) <= - x5 -  x3 + Bzfff + Bzffb + Bzfbf + Bzfbb + Byfff + Byffb - Bybff - Bybfb + Bxfff + Bxfbf - Bxbff - Bxbbf - x2 <= max(Bzfff, Bzbff)
+min(Bzffb, Bzbfb) <= x3 <= max(Bzffb, Bzbfb)
+min(Bzfbf, Bzbbf) <= x5 <= max(Bzfbf, Bzbbf)
+min(Bzfbb, Bzbbb) <= x2 <= max(Bzfbb, Bzbbb)
+
+
+C1 : -Bzfbf-Bzfbb-Byffb+Bybfb+Bxfff+Bxbff+Bxbbf;
+C2 : -Bzfbf-Bzfbb-Byffb+Bybfb+2*Bxbff+Bxbbf;
+C3 : +Bzbbf+Bzbbb-Byfbb+Bybbb+2*Bxbfb+Bxbbb;
+C4 : +2*Bzfff+Bzffb+Bzfbf+Bzfbb+Byfff+Byffb-Bybff-Bybfb+Bxfff+Bxfbf-Bxbff-Bxbbf;
+C5 : +Bzbfb+2*Bybbf-Bxfbb;
+C6 : Bzbbb+Byfbb+Bybbb+Bxbbb;
+C7 : Bzbbb+2*Bybbb+Bxbbb;
+C8 : -Bzffb+Byfff+Bybff-Bxfbf;
+C9 : -Bzffb+2*Bybff-Bxfbf;
+C10 : -Bzfbb+Byffb+Bybfb+Bxbbf;
+C11 : -Bzfbb+2*Bybfb+Bxbbf;
+e:
+(x5+x2-x1+C1)^2
++(x5+x2-x1+C2)^2
++(-x5-x4-x2 + C3)^2
++(-x5-x3-x2 + C4)^2
++(x4-x3+C5)^2
++(-x4-x2+C6)^2
++(-x4-x2+C7)^2
++(x3+x1+C8)^2
++(x3+x1 + C9)^2
++(x2-x1 + C10)^2
++(x2-x1 + C11)^2
++(Bzffb+x3)^2
++(Bzfbf+x5)^2
++(Bzfbb+x2)^2
++(x3+Bzbfb)^2
++(x5+Bzbbf)^2
++(x2+Bzbbb)^2
++(Bxfbf+x1)^2
++(Bxfbb+x4)^2
++(x1+Bxbbf)^2
++(x4+Bxbbb)^2
+;
+
+
+
+qp.set_d(x1,x1, 16);
+qp.set_d(x1,x1, 20);
+qp.set_d(x1,x1, 12);
+qp.set_d(x1,x1, 12);
+qp.set_d(x1,x1, 12);
+
+
+
+qp.set_d(x1,x2, -16);
+qp.set_d(x1,x3, 8);
+qp.set_d(x1,x5, -8);
+qp.set_d(x2,x3, 4);
+qp.set_d(x2,x4, 12);
+qp.set_d(x2,x5, 16);
+qp.set_d(x3,x4, -4);
+qp.set_d(x3,x5, 4);
+qp.set_d(x4,x5, 4);
+
+
+qp.set_c(x1, 2*C9+2*C8-2*C11-2*C10-2*C1+2*Bxfbf+2*Bxbbf);
+qp.set_c(x2, 2*C11+2*C10-2*C3+2*C2+2*C1-2*C7-2*C6-2*C4+2*Bzfbb+2*Bzbbb);
+qp.set_c(x3, 2*C9+2*C8-2*C5-2*C4+2*Bzffb+2*Bzbfb);
+qp.set_c(x4, -2*C7-2*C6+2*C5-2*C3+2*Bxfbb+2*Bxbbb);
+qp.set_c(x5, -2*C4-2*C3+2*C2-2*C2+2*C1+2*Bzfbf+2*Bzbbf);
+
+
+qp.set_c0(C9*C9*2 + C7*C7*2 + C4*C4*2 + C8*C8*2+ C6*C6*2+C5*C5*2+C3*C3*2+C2*C2*2+C11*C11*2+C1*C1*2
+		+C10*C10*2+Bzffb*Bzffb*2+Bzfbf*Bzfbf*2+Bzfbb*Bzfbb*2+Bzbfb*Bzbfb*2+Bzbbf*Bzbbf*2
+		+Bzbbb*Bzbbb*2+Bxfbf*Bxfbf*2+Bxfbb*Bxfbb*2+Bxbbf*Bxbbf*2+Bxbbb*Bxbbb*2);
+
+
+
+
+
+
+
+
+- x1+ x2 + x5 <=  max(Bxfff, Bxbff) - ( - Bzfbf - Bzfbb - Byffb + Bybfb + Bxbff + Bxbbf)
+- x1+ x2 + x5 => -(- Bzfbf - Bzfbb - Byffb + Bybfb + Bxbff + Bxbbf) + min(Bxfff, Bxbff)
+
+- x2 - x4 - x5 <= max(Bxffb, Bxbfb)+ ( Bzbbf + Bzbbb - Byfbb + Bybbb + Bxbfb + Bxbbb)
+- x2 - x4 - x5 => -(+ Bzbbf + Bzbbb - Byfbb + Bybbb + Bxbfb + Bxbbb) + min(Bxffb, Bxbfb)
+
+
+x1 + x3 <= max(Byfff, Bybff) -(- Bzffb + Bybff - Bxfbf)
+x1 + x3 => -(- Bzffb + Bybff - Bxfbf) + min(Byfff, Bybff)
+
+- x1 + x2 <= max(Byffb, Bybfb) - (- Bzfbb + Bybfb + Bxbbf)
+- x1 + x2 => -(- Bzfbb + Bybfb + Bxbbf) + min(Byffb, Bybfb)
+
+- x3 + x4 <= max(Byfbf, Bybbf) - (+ Bzbfb + Bybbf - Bxfbb)
+- x3 + x4 => -(+ Bzbfb + Bybbf - Bxfbb) + min(Byfbf, Bybbf)
+
+- x2 - x4 <= max(Byfbb, Bybbb) -(+ Bzbbb + Bybbb + Bxbbb)
+- x2 - x4 => -(+ Bzbbb + Bybbb + Bxbbb) + min(Byfbb, Bybbb)
+
+
+
+- x2 - x3 - x5 <= max(Bzfff, Bzbff) - (+ Bzfff + Bzffb + Bzfbf + Bzfbb + Byfff + Byffb - Bybff - Bybfb + Bxfff + Bxfbf - Bxbff - Bxbbf)
+- x2 - x3 - x5 => -(+ Bzfff + Bzffb + Bzfbf + Bzfbb + Byfff + Byffb - Bybff - Bybfb + Bxfff + Bxfbf - Bxbff - Bxbbf) + min(Bzfff, Bzbff)
+
+
+min(Bxfbf, Bxbbf) <= x1 <= max(Bxfbf, Bxbbf)
+min(Bzfbb, Bzbbb) <= x2 <= max(Bzfbb, Bzbbb)
+min(Bzffb, Bzbfb) <= x3 <= max(Bzffb, Bzbfb)
+min(Bxfbb, Bxbbb) <= x4 <= max(Bxfbb, Bxbbb)
+min(Bzfbf, Bzbbf) <= x5 <= max(Bzfbf, Bzbbf)
+
+
+
+
+
+
+
+
+
+qp.set_a(x1, 0,  -1); qp.set_a(x2, 0, 1); qp.set_a(x5, 0, 1); qp.set_r(0, CGAL::SMALLER); qp.set_b(0, max(Bxfff, Bxbff) - ( - Bzfbf - Bzfbb - Byffb + Bybfb + Bxbff + Bxbbf)); 
+qp.set_a(x1, 1,  -1); qp.set_a(x2, 1, 1); qp.set_a(x5, 1, 1); qp.set_r(1, CGAL::LARGER); qp.set_b(1, -(- Bzfbf - Bzfbb - Byffb + Bybfb + Bxbff + Bxbbf) + min(Bxfff, Bxbff)); 
+
+qp.set_a(x2, 2,  -1); qp.set_a(x4, 2, -1); qp.set_a(x5, 2, -1); qp.set_r(2, CGAL::SMALLER); qp.set_b(2, max(Bxffb, Bxbfb)+ ( Bzbbf + Bzbbb - Byfbb + Bybbb + Bxbfb + Bxbbb)); 
+qp.set_a(x2, 3,  -1); qp.set_a(x4, 3, -1); qp.set_a(x5, 3, -1); qp.set_r(3, CGAL::LARGER); qp.set_b(3, -(+ Bzbbf + Bzbbb - Byfbb + Bybbb + Bxbfb + Bxbbb) + min(Bxffb, Bxbfb)); 
+
+qp.set_a(x1, 4,  1); qp.set_a(x3, 4, 1); qp.set_r(4, CGAL::SMALLER); qp.set_b(4, max(Byfff, Bybff) -(- Bzffb + Bybff - Bxfbf)); 
+qp.set_a(x1, 5,  1); qp.set_a(x3, 5, 1); qp.set_r(5, CGAL::LARGER); qp.set_b(5, -(- Bzffb + Bybff - Bxfbf) + min(Byfff, Bybff)); 
+
+qp.set_a(x1, 6,  -1); qp.set_a(x2, 6, 1); qp.set_r(6, CGAL::SMALLER); qp.set_b(6, max(Byffb, Bybfb) - (- Bzfbb + Bybfb + Bxbbf)); 
+qp.set_a(x1, 7,  -1); qp.set_a(x2, 7, 1); qp.set_r(7, CGAL::LARGER); qp.set_b(7, -(- Bzfbb + Bybfb + Bxbbf) + min(Byffb, Bybfb));
+
+qp.set_a(x3, 8,  -1); qp.set_a(x4, 8, 1); qp.set_r(8, CGAL::SMALLER); qp.set_b(8, max(Byfbf, Bybbf) - (+ Bzbfb + Bybbf - Bxfbb)); 
+qp.set_a(x3, 9,  -1); qp.set_a(x4, 9, 1); qp.set_r(9, CGAL::LARGER); qp.set_b(9, -(+ Bzbfb + Bybbf - Bxfbb) + min(Byfbf, Bybbf));
+
+qp.set_a(x2, 10,  -1); qp.set_a(x4, 10, -1); qp.set_r(10, CGAL::SMALLER); qp.set_b(10, max(Byfbb, Bybbb) -(+ Bzbbb + Bybbb + Bxbbb)); 
+qp.set_a(x2, 11,  -1); qp.set_a(x4, 11, -1); qp.set_r(11, CGAL::LARGER); qp.set_b(11, -(+ Bzbbb + Bybbb + Bxbbb) + min(Byfbb, Bybbb));
+
+qp.set_a(x2, 12,  -1); qp.set_a(x3, 12, -1); qp.set_a(x5, 12, -1); qp.set_r(12, CGAL::SMALLER); qp.set_b(12, max(Bzfff, Bzbff) - (+ Bzfff + Bzffb + Bzfbf + Bzfbb + Byfff + Byffb - Bybff - Bybfb + Bxfff + Bxfbf - Bxbff - Bxbbf)); 
+qp.set_a(x2, 13,  -1); qp.set_a(x3, 13, -1); qp.set_a(x5, 13, -1); qp.set_r(13, CGAL::LARGER); qp.set_b(13, -(+ Bzfff + Bzffb + Bzfbf + Bzfbb + Byfff + Byffb - Bybff - Bybfb + Bxfff + Bxfbf - Bxbff - Bxbbf) + min(Bzfff, Bzbff)); 
+
+
+
+qp.set_a(x1, 14,  -1); qp.set_r(14, CGAL::SMALLER); qp.set_b(10, max(Bxfbf, Bxbbf)); 
+qp.set_a(x1, 15,  -1); qp.set_r(14, CGAL::LARGER); qp.set_b(10, min(Bxfbf, Bxbbf)); 
+
+qp.set_a(x2, 16,  -1); qp.set_r(15, CGAL::SMALLER); qp.set_b(10, max(Bzfbb, Bzbbb)); 
+qp.set_a(x2, 17,  -1); qp.set_r(15, CGAL::LARGER); qp.set_b(10, min(Bzfbb, Bzbbb)); 
+
+qp.set_a(x3, 18,  -1); qp.set_r(16, CGAL::SMALLER); qp.set_b(10, max(Bzffb, Bzbfb)); 
+qp.set_a(x3, 19,  -1); qp.set_r(16, CGAL::LARGER); qp.set_b(10, min(Bzffb, Bzbfb)); 
+
+qp.set_a(x4, 20,  -1); qp.set_r(17, CGAL::SMALLER); qp.set_b(10, max(Bxfbb, Bxbbb)); 
+qp.set_a(x4, 21,  -1); qp.set_r(17, CGAL::LARGER); qp.set_b(10, min(Bxfbb, Bxbbb)); 
+
+qp.set_a(x5, 22,  -1); qp.set_r(18, CGAL::SMALLER); qp.set_b(10,  max(Bzfbf, Bzbbf)); 
+qp.set_a(x5, 23,  -1); qp.set_r(18, CGAL::LARGER); qp.set_b(10, min(Bzfbf, Bzbbf)); 
+
