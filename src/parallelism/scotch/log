@@ -1,0 +1,6 @@
+scotch_mmk_m3 10 11 12 srcmesh.msh -gsrcmesh.xyz
+
+scotch_gmk_m3 2 3 4 srcgraph.grf -gsrcgraph.xyz
+scotch_gmk_msh srcmesh.msh  > srcmesh.grf
+scotch_amk_grf srcgraph.grf srcgraph.tgt
+./scotch_gpart 10 srcmesh.grf > srcmesh.map
