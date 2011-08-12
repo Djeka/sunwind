@@ -13,6 +13,9 @@ if ( COMMAND cmake_policy )
 endif()
  
 find_package(CGAL QUIET COMPONENTS Core )
+find_package(MPI REQUIRED)
+INCLUDE(CMakeForceCompiler)
+CMAKE_FORCE_CXX_COMPILER(mpicxx "MPI C++ Compiler")
 
 if ( CGAL_FOUND )
 
@@ -21,6 +24,7 @@ if ( CGAL_FOUND )
   include( CGAL_CreateSingleSourceCGALProgram )
 
   create_single_source_cgal_program( "main.cpp" )
+  create_single_source_cgal_program( "main-parallel.cpp" )
 
 else()
   
