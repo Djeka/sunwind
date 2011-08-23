@@ -48,7 +48,7 @@ class ParallelArray {
         public: static const signed int MODE_FLUX=0;
         public: static const signed int MODE_VALUES=1;
 
-#define SEND_DOUBLES_VALUES (2+/*density+heat energy*/9/*momentum+field*/)
+#define SEND_DOUBLES_VALUES (3+/* CHEAT density+heat energy*/9/*momentum+field*/)
 #define SEND_DOUBLES_FLUX (4*3/* 2 axes 2 sides 3 components of field*/)
         private: int mode_sizes[2];
         private: static const signed int  MAX_MODE_SIZE=SEND_DOUBLES_FLUX;
@@ -78,13 +78,15 @@ class ParallelArray {
                                      , MPI_DOUBLE,MPI_COMM_WORLD,&step1);
                              
                   };
-                  if(bufferposition==0) {
+           /*       if(bufferposition==0) {
                       *bptr=(char*)malloc(step+step1); 
                   } else {
                        *bptr=(char*)realloc(*bptr,bufferposition+step+step1);
-                  };                          
+                  };*/                          
                   bufferposition+=(step+step1);
                };
+
+               *bptr=(char*)malloc(bufferposition);
                SBuffersize[buffer_number]=bufferposition;
                SBufferusesize[buffer_number]=bufferposition;
         };
@@ -182,7 +184,7 @@ class ParallelArray {
 #ifdef DEBUG
             cout << "(i am " << myrank << ") unpacking recieve buffer " << buffer_number << " axe: " << axe << " dir: " << dir << ".\n";
             cout << "(i am " << myrank << "Rbuffers: " << RBuffers << "\n";
-            cout << "(i am " << myrank << "RBuffers[buffer_number]: " << RBuffers[buffer_number] << "\n";
+            cout << "(i am " << myrank << "RBuffers[buffer_number]: " << (void*)(RBuffers[buffer_number]) << "\n";
             cout << "(i am " << myrank << "bptr: " << bptr << "\n";
 #endif 
               // First - find first border cell, create binded one, if necessary.
@@ -196,7 +198,7 @@ class ParallelArray {
                   HierarchyCell* c = (HierarchyCell*) it.next();
 #ifdef DEBUG
             
-            cout << "(i am " << myrank << ") unpacking char from buffer at " << (bptr[0]) <<  " size: " << bufsize << " position " << bufferposition << ".\n";
+            cout << "(i am " << myrank << ") unpacking char from buffer at " << (void*)(bptr[0]) <<  " size: " << bufsize << " position " << bufferposition << ".\n";
 #endif
                   MPI_Unpack(bptr[0],bufsize,&bufferposition,&flag,1,MPI_CHAR,MPI_COMM_WORLD);
 #ifdef DEBUG
@@ -213,7 +215,7 @@ class ParallelArray {
                     };
 
 #ifdef DEBUG
-            cout << "(i am " << myrank << ") unpacking char from burrer at " << (long int)(bptr[0]) << " size: " << bufsize << " position " << bufferposition << " will get " << mode_sizes[mode] << " doubles .\n";
+            cout << "(i am " << myrank << ") unpacking char from burrer at " << (void*)(bptr[0]) << " size: " << bufsize << " position " << bufferposition << " will get " << mode_sizes[mode] << " doubles .\n";
 #endif
                     MPI_Unpack(bptr[0],bufsize,&bufferposition,data,mode_sizes[mode],MPI_DOUBLE,MPI_COMM_WORLD);
 #ifdef DEBUG
@@ -407,7 +409,7 @@ class ParallelArray {
             };  
 /***********  Here we can get better performance by doing MPI_Waitany + some intelegent cicle. **************/
 #ifdef DEBUG
-            cout << "(i am " << myrank << ") Waiting for recv requests:\n";
+            cout << "(i am " << myrank << ") Waiting for "<< nmyboards <<" recv requests:\n";
 #endif 
             MPI_Waitall(nmyboards,myRecvRequest,myRecvStatus);
 #ifdef DEBUG
@@ -541,10 +543,10 @@ class ParallelArray {
                } else {
                   if(RBufferusesize[i]!=RBuffersize[i]) {
 #ifdef DEBUG 
-            cout << "(i am " << myrank << ") Size changed. Reallocating at new size: RBuffersize[" << i << "] = " << RBuffersize[i];
+            cout << "(i am " << myrank << ") Size changed. Reallocating at new size: RBuffersize[" << i << "] = " << RBuffersize[i] << "\n";
 #endif
                      free(RBuffers[i]);
-                     RBuffersize[i]=RBufferusesize[i];
+                     RBufferusesize[i]=RBuffersize[i];
                      RBuffers[i]=(char*)malloc(RBuffersize[i]);
                   };
                };

@@ -95,7 +95,7 @@ int main( int argc, char** argv )
            ca->addBorderCondition(&earthBC);
   	cout << "Split begins" << endl;
 	CASplitConditionEarthDipoleInitial splitCondition = CASplitConditionEarthDipoleInitial(ca, td, &initParams);
-//	ca->splitCellArray(&splitCondition,false);
+	ca->splitCellArray(&splitCondition);
 	cout << "Split has finished" << endl;
 
 	cout << "Define internal borders..." << endl;
@@ -107,6 +107,7 @@ int main( int argc, char** argv )
         
 
         };
+        pa.update_buffers=true;
         cout << "Di done\n";
 	MethodLaksaFridrikhsa method = MethodLaksaFridrikhsa();
 	MethodLaksaFridrikhsaDipole bgmethod = MethodLaksaFridrikhsaDipole();
