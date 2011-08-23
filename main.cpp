@@ -108,7 +108,7 @@ int main( void )
 	MethodLaksaFridrikhsaDipole bgmethod = MethodLaksaFridrikhsaDipole();
 	HierarchyCalculater calc = HierarchyCalculater(&ca, &method, &bgmethod);
 
-	for(int itime=0; itime <= 1000; itime++){
+	for(int itime=0; itime <= 10; itime++){
 //		if(itime%100 == 0)	vis1D.visualize("visualize.data");
 		if(itime%100 == 0) vis2D.visualize("visualize.data", "res");
 

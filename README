@@ -1,1 +1,22 @@
-test
+BUILDING
+
+Yuo need the following tools^
+
+mpicxx (tested on openmpi+gcc)
+cgal
+cmake
+
+run 
+
+cmake .
+make
+
+should end up with created main and main-parallel.
+
+DEBUGGING
+
+You need gdb and xterm.
+
+mpirun -np 2 xterm -e ./main-parallel
+
+

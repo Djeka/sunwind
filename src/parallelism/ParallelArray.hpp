@@ -9,7 +9,7 @@ using namespace std;
 //                    untill method Glue is not written...
 
 #define SELF_SENDER_HACK 1
-#define DEBUG 1
+//#define DEBUG 1
 
 
 
@@ -165,13 +165,14 @@ class ParallelArray {
                SBufferusesize[buffer_number]=bufferposition;
                delete data;
         };
+
         private: void unpackRecvBuffer(HierarchyCellArray* ca, int axe,int dir,int buffer_number, int mode) {
 /*
  *            Unpacks buffer, creates cells, if necessary.
  */
                int bufferposition=0;
                int step=0;
-               double* data;
+               double* data = new double[mode_sizes[mode]];
                char** bptr=RBuffers+buffer_number;
                int bufsize =  RBufferusesize[buffer_number];
                char t='t';
@@ -179,7 +180,10 @@ class ParallelArray {
                char flag;
               
 #ifdef DEBUG
-            cout << "(i am " << myrank << ") unpacking recieve buffer" << buffer_number << " axe: " << axe << " dir: " << dir << ".\n";
+            cout << "(i am " << myrank << ") unpacking recieve buffer " << buffer_number << " axe: " << axe << " dir: " << dir << ".\n";
+            cout << "(i am " << myrank << "Rbuffers: " << RBuffers << "\n";
+            cout << "(i am " << myrank << "RBuffers[buffer_number]: " << RBuffers[buffer_number] << "\n";
+            cout << "(i am " << myrank << "bptr: " << bptr << "\n";
 #endif 
               // First - find first border cell, create binded one, if necessary.
               BorderCellsIterator bit = BorderCellsIterator(ca, axe, dir, true); 
@@ -190,7 +194,14 @@ class ParallelArray {
 
               for(BindedCellsIterator it = BindedCellsIterator((CellArray*)ca, axe, dir, true, true); it.hasNext();){
                   HierarchyCell* c = (HierarchyCell*) it.next();
-                  MPI_Unpack(*bptr,bufsize,&bufferposition,&flag,1,MPI_CHAR,MPI_COMM_WORLD);
+#ifdef DEBUG
+            
+            cout << "(i am " << myrank << ") unpacking char from buffer at " << (bptr[0]) <<  " size: " << bufsize << " position " << bufferposition << ".\n";
+#endif
+                  MPI_Unpack(bptr[0],bufsize,&bufferposition,&flag,1,MPI_CHAR,MPI_COMM_WORLD);
+#ifdef DEBUG
+            cout << "(i am " << myrank << ") done unpacking char. Got: " << flag << ".\n";
+#endif
                   if(flag==t) {
                     if(!(c->isSplitted())) {
                       ca->splitCell(c);
@@ -200,7 +211,14 @@ class ParallelArray {
                     // TBD: join!
                     assert(false);
                     };
-                    MPI_Unpack(*bptr,bufsize,&bufferposition,data,mode_sizes[mode],MPI_DOUBLE,MPI_COMM_WORLD);
+
+#ifdef DEBUG
+            cout << "(i am " << myrank << ") unpacking char from burrer at " << (long int)(bptr[0]) << " size: " << bufsize << " position " << bufferposition << " will get " << mode_sizes[mode] << " doubles .\n";
+#endif
+                    MPI_Unpack(bptr[0],bufsize,&bufferposition,data,mode_sizes[mode],MPI_DOUBLE,MPI_COMM_WORLD);
+#ifdef DEBUG
+            cout << "(i am " << myrank << ") data unpacked.\n";
+#endif
                     switch (mode) {
                       case MODE_VALUES: {
                         c->setDensity(data[0]);
@@ -246,12 +264,14 @@ class ParallelArray {
                             break;
                       
                      };
-                     default: { 
+                     default: {
+                        printf("WRONG mode in unpackRecvBuffer!\n");
                         assert(false);
                      };
                   };
               };
             };
+            delete data;
         };
 
         private: void updateSendBuffers() {
@@ -403,6 +423,7 @@ class ParallelArray {
             free(mySendStatus);
 //////////////////////////////////////////////////////////////
 //  //  //  Ok, now let's unpack them...
+            brdi=0;
             for(int i=0;i<nmycells;i++) {
             int* X = mycellxyz + 3*i;
             int Y[3];
@@ -508,12 +529,20 @@ class ParallelArray {
             cout << "(i am "<< myrank <<") Buffer sizes redistributed.\n";
 #endif
             for(int i=0;i<nmyboards;i++) {
-                
+#ifdef DEBUG
+            cout << "(i am " << myrank << ") RBuffersize[" << i << "] = " << RBuffersize[i];
+#endif           
                if(RBuffers[i]==NULL) {
+#ifdef DEBUG  
+            cout << " Allocating new space: " << RBuffersize[i] << "\n";
+#endif
                   RBufferusesize[i]=RBuffersize[i];
                   RBuffers[i]=(char*)malloc(RBuffersize[i]);
                } else {
-                  if(RBufferusesize[i]>RBuffersize[i]) {
+                  if(RBufferusesize[i]!=RBuffersize[i]) {
+#ifdef DEBUG 
+            cout << "(i am " << myrank << ") Size changed. Reallocating at new size: RBuffersize[" << i << "] = " << RBuffersize[i];
+#endif
                      free(RBuffers[i]);
                      RBuffersize[i]=RBufferusesize[i];
                      RBuffers[i]=(char*)malloc(RBuffersize[i]);
@@ -654,7 +683,8 @@ class ParallelArray {
                     paralleldata >> n;
                     assert(i==n);
                     paralleldata >> rank;
-                    assert(rank>0);
+                    cout << "i:" << i << " rank: " << rank <<"\n"; 
+                    assert(rank>=0);
                     assert(rank<commsize);
                     int x,y,z;
                     xyzdata >> n;
@@ -798,6 +828,7 @@ class ParallelArray {
 /*
  *           
  */ 
+          syncBufferSizes();
           if(mode==MODE_VALUES) {
             syncTimeSteps();
           };

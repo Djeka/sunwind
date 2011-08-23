@@ -95,7 +95,7 @@ int main( int argc, char** argv )
            ca->addBorderCondition(&earthBC);
   	cout << "Split begins" << endl;
 	CASplitConditionEarthDipoleInitial splitCondition = CASplitConditionEarthDipoleInitial(ca, td, &initParams);
-	ca->splitCellArray(&splitCondition);
+//	ca->splitCellArray(&splitCondition,false);
 	cout << "Split has finished" << endl;
 
 	cout << "Define internal borders..." << endl;

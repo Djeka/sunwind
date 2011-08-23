@@ -7,7 +7,7 @@ project( sunwind_example )
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
- 
+set(CMAKE_CXX_FLAGS_RELEASE " -march=core2 -msse -msse2 -malign-double -mssse3 -mmmx -mpc32 -mtune=core2 -O3 -pg") 
 if ( COMMAND cmake_policy )
   cmake_policy( SET CMP0003 NEW )  
 endif()
