@@ -53,6 +53,8 @@ using namespace std;
 #include "src/calculaters/Calculater.hpp"
 #include "src/calculaters/HierarchyCalculater.hpp"
 #include "src/bc/BorderConditionEarth.hpp"
+
+#include "src/parallelism/ParallelArray.hpp"
 #include "src/test/TestObject.hpp"
 #include "src/test/TestRaspadRazriva.hpp"
 #include "src/test/TestHierarchyCellArrayLinks.hpp"
@@ -71,7 +73,7 @@ void test(){
 	test.test();
 }
 
-int main( void )
+int main( int argc, char** argv )
 {
 
 //	test();
@@ -82,51 +84,69 @@ int main( void )
 	cout.setf(ios::scientific,ios::floatfield);
 	cout.precision(10);
 
-	TaskData td = TaskData("task.data", Constants::Re);
-	InitialParametersFunctionEarth initParams = InitialParametersFunctionEarth(&td);
-	BorderConditionEarth earthBC =  BorderConditionEarth(&td);
-	HierarchyCellArray ca = HierarchyCellArray(&td);
-	ca.addBorderCondition(&earthBC);
-
-	cout << "Split begins" << endl;
-	CASplitConditionEarthDipoleInitial splitCondition = CASplitConditionEarthDipoleInitial(&ca, &td, &initParams);
-	ca.splitCellArray(&splitCondition);
+	TaskData * td = new TaskData("task.data", Constants::Re);
+	InitialParametersFunctionEarth initParams = InitialParametersFunctionEarth(td);
+	BorderConditionEarth earthBC =  BorderConditionEarth(td);
+//	HierarchyCellArray ca = HierarchyCellArray(&td);
+        ParallelArray pa = ParallelArray(td, argc,argv);
+        cout << "pa inited" << endl;
+	for(int i=0;i<pa.nmycells;i++) {
+           HierarchyCellArray* ca = (pa.Arrays[i]);
+           ca->addBorderCondition(&earthBC);
+  	cout << "Split begins" << endl;
+	CASplitConditionEarthDipoleInitial splitCondition = CASplitConditionEarthDipoleInitial(ca, td, &initParams);
+	ca->splitCellArray(&splitCondition);
 	cout << "Split has finished" << endl;
 
 	cout << "Define internal borders..." << endl;
-	ca.defineInternalBorders();
+	ca->defineInternalBorders();
 	cout << "defined" << endl;
 
-	DataInitiaterForHierarchyCellArray di = DataInitiaterForHierarchyCellArray(&ca, &td, &initParams);
+	DataInitiaterForHierarchyCellArray di = DataInitiaterForHierarchyCellArray(ca, pa.mytds[i], &initParams);
 	di.initiate();
+        
 
-	Visualizer1DPlot vis1D = Visualizer1DPlot(&ca, &td, Constants::Re, "res/1D");
-	Visualizer2DPlot vis2D = Visualizer2DPlot(&ca, &td, Constants::Re, Constants::Re);
-
-
+        };
+        pa.update_buffers=true;
+        cout << "Di done\n";
 	MethodLaksaFridrikhsa method = MethodLaksaFridrikhsa();
 	MethodLaksaFridrikhsaDipole bgmethod = MethodLaksaFridrikhsaDipole();
-	HierarchyCalculater calc = HierarchyCalculater(&ca, &method, &bgmethod);
+        cout << "Methods initiated\n";
 
-	for(int itime=0; itime <= 10; itime++){
+	for(int itime=0; itime <= 1000; itime++){
+        cout << "Itime:" << itime;
+        startTotal = clock();
+        pa.prepareStep(ParallelArray::MODE_VALUES);
+        for(int i=0;i<pa.nmycells;i++){
+           HierarchyCellArray* ca = (pa.Arrays[i]);
+ 
+	Visualizer1DPlot vis1D = Visualizer1DPlot(ca, pa.mytds[i], Constants::Re, "res/1D");
+	Visualizer2DPlot vis2D = Visualizer2DPlot(ca, pa.mytds[i], Constants::Re, Constants::Re);
+
+	HierarchyCalculater calc = HierarchyCalculater(ca, &method, &bgmethod);
+
 //		if(itime%100 == 0)	vis1D.visualize("visualize.data");
 		if(itime%100 == 0) vis2D.visualize("visualize.data", "res");
 
-startTotal = clock();
 
-		ca.setTimeStep(100);
-		ca.updateBorderCells();
+		ca->setTimeStep(100);
+		ca->updateBorderCells();
 		calc.calculateFlows();
-		ca.showLine(&calc, itime);
-
-		ca.updateBorderSides();
+		ca->showLine(&calc, itime);
+        };
+        pa.prepareStep(ParallelArray::MODE_FLUX);
+        
+        for(int i=0;i<pa.nmycells;i++){
+                HierarchyCellArray * ca = pa.Arrays[i];
+	        HierarchyCalculater calc = HierarchyCalculater(ca, &method, &bgmethod);
+		ca->updateBorderSides();
 		calc.calculateFieldE();
 		calc.calculateFieldB();
 
-		ca.calculateIncrements();
-		ca.update();
-
-cout.setf(ios::showpoint,ios::floatfield); cout.precision(3);
+		ca->calculateIncrements();
+		ca->update();
+        };
+                cout.setf(ios::showpoint,ios::floatfield); cout.precision(3);
 cout << "Total time: " << ((double)(clock()-startTotal))/CLOCKS_PER_SEC << endl;
 cout.setf(ios::scientific,ios::floatfield); cout.precision(10);	
 	}

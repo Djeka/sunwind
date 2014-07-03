@@ -12,3 +12,7 @@
 0	Z snapshot slice [Re]
 0.5	Splitting deep measure
 -8.0e25	Магнитный диполь [Гс*см^3]
+2       NPx
+2       NPy
+2       NPz
+

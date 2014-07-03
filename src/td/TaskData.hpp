@@ -11,10 +11,12 @@ class TaskData{
 	private: double slice[3];
 	private: double splittingDeepMeasure;
 	private: double dipole;
-
+        private: double Re;
+        private: int NP[3];
 	public: TaskData(string name, double rnorm){
 		ifstream f(name.c_str());
 		int i = 0;
+                Re=rnorm;
 		while(!f.eof()){
 			string str;
 			getline(f, str);
@@ -22,10 +24,10 @@ class TaskData{
 			double fvalue;
 			int ivalue;
 
-			if(i>=0 and i<=2) {
+			if(i>=0 and i<=2) {  //// Nx,Ny,Nz
 				sscanf(svalue.c_str(), "%d", &ivalue);
 				n[i] = ivalue;
-			} else if(i>=3 and i<=5){
+			} else if(i>=3 and i<=5){  // Xld,Yld
 				std::istringstream stm;
 				stm.str(svalue);
 				stm >>fvalue;
@@ -53,7 +55,10 @@ class TaskData{
 				stm.str(svalue);
 				stm >>fvalue;
 				dipole = fvalue;
-			}
+			} else if((i>13)&&(i<=16)) {
+                                sscanf(svalue.c_str(), "%d", &ivalue);
+                                NP[i-14]=ivalue;
+                        };
 			i++;
 		}
 		f.close();
@@ -62,9 +67,28 @@ class TaskData{
 			h[i] = L[i] / n[i];
 		}
 	}
-
+        
+        public: TaskData(TaskData* parenttd,int* X, int* dim) {
+              int i;
+              for(i=0;i<3;i++) {
+                NP[i]=1;
+                n[i]=parenttd->getN(i);
+                Re=parenttd->getRe();
+                L[i]=parenttd->getL(i)/((double)dim[i]);
+                Ll[i]=parenttd->getLl(i)+L[i]*((double)X[i]);
+                slice[i]=parenttd->getSlice(i);
+              };
+              splittingDeepMeasure=parenttd->getSplittingDeepMeasure();
+	      for(int i=0; i<3; i++){
+		h[i] = L[i] / n[i];
+	      };
+              dipole=parenttd->getEarthMagneticDipole();
+        }
 	public: int getN(int ind){
 		return n[ind];
+	}
+	public: int getNP(int ind){
+		return NP[ind];
 	}
 	public: double getSlice(int ind){
 		return slice[ind];
@@ -84,4 +108,7 @@ class TaskData{
 	public: double getEarthMagneticDipole(){
 		return dipole;
 	}
+        public: double getRe(){
+                return Re;
+        };
 };
